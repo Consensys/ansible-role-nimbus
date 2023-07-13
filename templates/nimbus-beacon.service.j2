@@ -7,7 +7,7 @@ User={{ nimbus_user }}
 Group={{ nimbus_group }}
 Environment=HOME=/home/{{ nimbus_user }}
 Type=simple
-ExecStart=/bin/sh -c "{{ nimbus_current_dir }}/nimbus-beacon {{ nimbus_beacon_cmdline_args }} >> {{ nimbus_log_dir }}/beacon.log 2>&1"
+ExecStart=/bin/sh -c "{{ nimbus_current_dir }}/build/nimbus_beacon_node --nat extip:{{geth_host_ip}} {{ nimbus_beacon_cmdline_args }} >> {{ nimbus_log_dir }}/beacon.log 2>&1"
 SuccessExitStatus=143
 Restart=on-failure
 RestartSec=10s

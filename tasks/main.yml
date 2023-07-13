@@ -12,10 +12,10 @@
 - name: Install nimbus
   include_tasks: "install.yml"
 
-# - name: Start beacon
-#   include_tasks: "beacon.yml"
-#   when: nimbus_beacon_enabled
+- name: Start beacon
+  include_tasks: "beacon.yml"
+  when: nimbus_beacon_enabled
 
-# - name: Start validator
-#   include_tasks: "validator.yml"
-#   when: nimbus_validator_enabled
+- name: Start validator
+  include_tasks: "validator.yml"
+  when: nimbus_validator_enabled

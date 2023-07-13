@@ -3,41 +3,33 @@
   set_fact:
     nimbus_validator_cmdline_args: >
       {{nimbus_validator_cmdline_args}}
-      --{{nimbus_network}}
-      --datadir={{nimbus_validator_data_dir}}
-      --wallet-dir={{ nimbus_wallet_dir }}
-      --verbosity={{nimbus_log_level}}
-      --log-file={{nimbus_log_dir}}/validator.log
+      --network={{nimbus_network}}
+      --data-dir={{nimbus_validator_data_dir}}
       --log-format=json
+      --log-level={{nimbus_log_level}}
+      --log-file={{nimbus_log_dir}}/validator.log
       --jwt-secret={{nimbus_jwt_auth_file}}
-      --execution-endpoint={{nimbus_execution_urls}}
-      --enable-builder
-      --validator-rpc-provider='{{nimbus_validator_validator_interface}}:{{nimbus_rpc_port}}'
-      --validator-rest-api-provider='{{nimbus_validator_validator_interface}}:{{nimbus_grpc_port}}'
-      --validator-rpc-gateway-provider='{{nimbus_validator_validator_interface}}:{{nimbus_grpc_port}}'
-      --accept-terms-of-use
-      --enable-doppelganger
-      --enable-external-slasher-protection
-    
+      --web3-url={{nimbus_execution_urls}}
+      --non-interactive
+      --status-bar=false
+      --doppelganger-detection
+      --beacon-node='{{nimbus_validator_beaconnodes}}'
+      --keymanager
+      --keymanager-port={{ nimbus_keymanger_port }}
+      --keymanager-address='{{nimbus_keymanger_interface}}'
+      --keymanager-allow-origin={{ nimbus_keymanager_cors }}
+      --keymanager-token-file={{nimbus_keymanager_token_file}}
+      --validators-dir={{nimbus_keys_dir}}
+      --secrets-dir={{nimbus_secrets_dir}}
+
 - name: Add metrics to the validator cmdline_args
   set_fact:
     nimbus_validator_cmdline_args: >
       {{nimbus_validator_cmdline_args}}
-      --monitoring-host='{{ nimbus_metrics_interface}}'
-      --monitoring-port={{ nimbus_validator_metrics_port}}
+      --metrics
+      --metrics-address='{{ nimbus_metrics_interface}}'
+      --metrics-port={{ nimbus_validator_metrics_port}}
   when: nimbus_metrics_enabled|bool == True
-
-- name: Add RPC to the validator cmdline_args
-  set_fact:
-    nimbus_validator_cmdline_args: >
-      {{nimbus_validator_cmdline_args}}
-      --rpc-host='{{nimbus_rpc_interface}}'
-      --rpc-port={{nimbus_rpc_port}}
-      --grpc-gateway-corsdomain={{nimbus_rpc_cors}}
-      --grpc-gateway-host='{{nimbus_rpc_interface}}'
-      --grpc-gateway-port={{nimbus_grpc_port}}
-      --http-modules={{ nimbus_http_modules }}
-  when: nimbus_rpc_enabled|bool == True
 
 - name: Add fee receipt to the validator cmdline_args
   set_fact:
@@ -45,14 +37,6 @@
       {{nimbus_validator_cmdline_args}}
       --suggested-fee-recipient={{nimbus_default_fee_recipient}}
   when: nimbus_default_fee_recipient != ""
-
-- name: Add checkpoint sync to the validator cmdline_args
-  set_fact:
-    nimbus_validator_cmdline_args: >
-      {{nimbus_validator_cmdline_args}}
-      --checkpoint-sync-url={{ nimbus_checkpoint_sync_url }}
-      --genesis-validator-api-url={{ nimbus_checkpoint_sync_url }}
-  when: nimbus_checkpoint_sync_url != ""
 
 - name: Add custom cli args if provided
   set_fact:

@@ -23,7 +23,7 @@
     - "{{ nimbus_install_dir }}"    
     - "{{ nimbus_config_dir }}"
     - "{{ nimbus_keys_dir }}"
-    - "{{ nimbus_wallet_dir }}"
+    - "{{nimbus_secrets_dir}}"
     - "{{ nimbus_data_dir }}"
     - "{{ nimbus_validator_data_dir }}"
     - "{{ nimbus_log_dir }}"
@@ -48,7 +48,7 @@
 
 - name: Create a symlink to current
   file:
-    src: "{{ nimbus_install_dir }}/"
+    src: "{{ nimbus_install_dir }}/nimbus-eth2_Linux_{{nimbus_architecture}}_{{nimbus_version[1:] }}_{{ nimbus_git_hash }}"
     dest: "{{ nimbus_current_dir }}"
     state: link
   register: create_symlink

@@ -39,10 +39,10 @@ All variables which can be overridden are stored in [defaults/main.yml](defaults
 | `nimbus_network`             | mainnet                       | Predefined network configuration                                                                                    |
 | `nimbus_jwt_auth_file`       | "/etc/jwt-secret.hex"         | Path of the JWT file                                                                                                |
 | `nimbus_execution_urls`                 | "http://127.0.0.1:8551" | The elc execution url                                                                                               |
-| `nimbus_validator_beacon_interface`     | "http://127.0.01"       | The beacon endpoint for the validator to use                                                                |
-| `nimbus_checkpoint_sync_url`            | "https://beaconstate-{{nimbus_network}}.chainsafe.io" | Checkpoint sync to speed things up                                          |
-| `nimbus_default_fee_recipient`          | ""                      | The default fee recepient address                                                                         |
-| `nimbus_keystores_dir`  | "/config/keys"                          |  The keys directory for validators                                                                        |
+| `nimbus_validator_beaconnodes`    | "http://127.0.0.1:5051"       | The beacon endpoint for the validator to use                                                                |
+| `nimbus_default_fee_recipient`    | ""                            | The default fee recepient address                                                                         |
+| `nimbus_keys_dir`                 | "/config/keys"                          |  The keys directory for validators                                                                        |
+| `nimbus_secrets_dir`              | "/config/secrets"                       |  The secrets directory for validators                                                                        |
 | `nimbus_beacon_enabled`    | True                                 |  Default run the beacon node                                                                              |
 | `nimbus_validator_enabled` | False                                | Whether to run in validator mode - please note that the secrets and keys need to be copied by you         |
 
