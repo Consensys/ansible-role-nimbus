@@ -22,7 +22,7 @@ Ansible role that will install, configure and runs [nimbus](https://github.com/n
 
 ### Role Variables:
 
-All variables which can be overridden are stored in [defaults/main.yml](defaults/main.yml) file. By and large these variables are configuration options. Please refer to the nimbus [docs](https://docs.prylabs.network/docs/nimbus-usage/parameters) for more information
+All variables which can be overridden are stored in [defaults/main.yml](defaults/main.yml) file. By and large these variables are configuration options. Please refer to the nimbus [docs](https://nimbus.guide/options.html) for more information
 
 
 | Name                           | Default Value                      |  Description                                                                                                        |
@@ -46,12 +46,6 @@ All variables which can be overridden are stored in [defaults/main.yml](defaults
 | `nimbus_beacon_enabled`    | True                                 |  Default run the beacon node                                                                              |
 | `nimbus_validator_enabled` | False                                | Whether to run in validator mode - please note that the secrets and keys need to be copied by you         |
 
-
-nimbus_beacon_custom_cmdline_args: ""
-nimbus_validator_custom_cmdline_args: ""
-
-nimbus_beacon_enabled: True
-nimbus_validator_enabled: False
 ### Keys/Secrets
 Please note that you must put your own secrets and keys in the config directory that you are using ie `nimbus_config_dir`
 
@@ -75,6 +69,7 @@ Replace `x.y.z` below with the version you would like to use from the nimbus [re
   - role: consensys.nimbus
     vars:
       nimbus_version: vx.y.z
+      nimbus_git_hash: abcd1203
 
 ```
 
@@ -102,6 +97,8 @@ Replace `x.y.z` below with the version you would like to use from the nimbus [re
   - role: ansible-role-nimbus
     vars:
       nimbus_version: vx.y.z
+      nimbus_git_hash: abcd1203
+
 
 ```
 
