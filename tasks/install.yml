@@ -1,0 +1,64 @@
+---
+- name: Ensure nimbus group exists
+  group:
+    name: "{{ nimbus_group }}"
+    state: present
+  become: true
+
+- name: Create nimbus user
+  user:
+    comment:  nimbus client user
+    name: "{{ nimbus_user }}"
+    group: "{{ nimbus_group }}"
+  become: true
+
+- name: Create directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ nimbus_user }}"
+    group: "{{ nimbus_group }}"
+  loop:
+    - "{{ nimbus_base_dir }}"
+    - "{{ nimbus_install_dir }}"    
+    - "{{ nimbus_config_dir }}"
+    - "{{ nimbus_keys_dir }}"
+    - "{{ nimbus_wallet_dir }}"
+    - "{{ nimbus_data_dir }}"
+    - "{{ nimbus_validator_data_dir }}"
+    - "{{ nimbus_log_dir }}"
+  become: true
+
+- name: Setup logrotate
+  template:
+    src: "logrotate/nimbus"
+    dest: "/etc/logrotate.d/nimbus"
+  become: true
+
+- name: Get nimbus binary to install directory
+  unarchive:
+    src: "{{ nimbus_download_url }}"
+    remote_src: "{{ true }}"
+    dest: "{{ nimbus_install_dir }}"
+    owner: "{{ nimbus_user }}"
+    group: "{{ nimbus_group }}"
+    mode: '0775'
+  become: true
+  register: extract_src
+
+- name: Create a symlink to current
+  file:
+    src: "{{ nimbus_install_dir }}/"
+    dest: "{{ nimbus_current_dir }}"
+    state: link
+  register: create_symlink
+  become: true
+
+- name: Set updated optionally to trigger a systemd restart at the end
+  set_fact:
+    nimbus_state_updates: "{{ nimbus_state_updates + ['nimbus.install_dir'] }}"
+    nimbus_state_updates_validator: "{{ nimbus_state_updates_validator + ['nimbus.install_dir'] }}"
+    nimbus_state_updates_beacon: "{{ nimbus_state_updates_beacon + ['nimbus.install_dir'] }}"
+  when: >
+    extract_src is changed or 
+    create_symlink is changed

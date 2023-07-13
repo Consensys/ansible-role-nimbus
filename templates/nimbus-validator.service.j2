@@ -1,0 +1,17 @@
+[Unit]
+Description=nimbus-validator
+After=syslog.target network.target
+
+[Service]
+User={{ nimbus_user }}
+Group={{ nimbus_group }}
+Environment=HOME=/home/{{ nimbus_user }}
+Type=simple
+ExecStart=/bin/sh -c "{{ nimbus_current_dir }}/nimbus-validator {{ nimbus_validator_cmdline_args }} >> {{ nimbus_log_dir }}/validator.log 2>&1"
+SuccessExitStatus=143
+Restart=on-failure
+RestartSec=10s
+WorkingDirectory={{ nimbus_current_dir }}
+
+[Install]
+WantedBy=multi-user.target

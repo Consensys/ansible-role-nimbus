@@ -1,0 +1,63 @@
+---
+# User and group
+nimbus_user: nimbus
+nimbus_group: "{{ nimbus_user }}"
+nimbus_architecture: "amd64" 
+# Version to install - linux only!
+nimbus_download_url: "https://github.com/status-im/nimbus-eth2/releases/download/{{ nimbus_version }}/nimbus-eth2_Linux_{{nimbus_architecture}}_{{ nimbus_version[1:] }}_{{ nimbus_git_hash }}.tar.gz"
+
+# Directory paths
+nimbus_base_dir: "/opt/nimbus"
+nimbus_install_dir: "{{ nimbus_base_dir }}/{{ nimbus_version }}"
+nimbus_current_dir: "{{ nimbus_base_dir }}/current"
+nimbus_data_dir: "{{ nimbus_base_dir }}/data"
+nimbus_validator_data_dir: "{{ nimbus_base_dir }}/validatorData"
+nimbus_config_dir: "/etc/nimbus"
+nimbus_log_dir: "/var/log/nimbus"
+nimbus_jwt_auth_file: "/etc/jwt-secret.hex"
+nimbus_keys_dir: "{{nimbus_config_dir}}/keys"
+nimbus_wallet_dir: "{{nimbus_config_dir}}/wallet"
+nimbus_wallet_password_file: ""
+
+nimbus_beacon_enabled: True
+nimbus_validator_enabled: False
+nimbus_beacon_cmdline_args: ""
+nimbus_validator_cmdline_args: ""
+nimbus_beacon_custom_cmdline_args: ""
+nimbus_validator_custom_cmdline_args: ""
+nimbus_validator_beacon_interface: "http://127.0.0.1"
+
+# Managed service config
+nimbus_systemd_state: restarted
+nimbus_systemd_dir: /etc/systemd/system
+nimbus_state_updates: []
+nimbus_state_updates_validator: []
+nimbus_state_updates_beacon: []
+
+# nimbus config
+nimbus_network: mainnet
+nimbus_host_ip: ""
+nimbus_default_ip: "127.0.0.1"
+nimbus_log_level: info
+nimbus_execution_urls: "http://127.0.0.1:8551"
+nimbus_checkpoint_sync_url: "https://beaconstate-{{nimbus_network}}.chainsafe.io"
+nimbus_default_fee_recipient: ""
+
+#p2p
+nimbus_p2p_enabled: "True"
+nimbus_p2p_port: 9000
+
+#metrics
+nimbus_metrics_enabled: "True"
+nimbus_metrics_interface: 0.0.0.0
+nimbus_metrics_port: 8008
+nimbus_validator_metrics_port: 8009
+nimbus_pprof_port: 6006
+
+# rpc
+nimbus_rpc_enabled: "True"
+nimbus_rpc_interface: "127.0.0.1"
+nimbus_rpc_port: 4000
+nimbus_grpc_port: 5051
+nimbus_rpc_cors: "*"
+nimbus_http_modules: "nimbus,eth"

@@ -1,0 +1,30 @@
+---
+galaxy_info:
+  author: consensys
+  role_name: nimbus
+  description: nimbus is an open-source ethereum 2 client
+  company: consensys
+  license: license (Apache)
+  min_ansible_version: 2.6
+  platforms:
+    - name: Debian
+      versions:
+        - bookworm
+        - bullseye
+        - buster
+    - name: Ubuntu
+      versions:
+        - jammy
+        - bionic
+        - xenial
+    - name: Fedora
+      versions:
+        - 39
+        - 38
+        - 37
+  galaxy_tags:
+    - nimbus
+    - blockchain
+    - ethereum
+    - enterprise
+    - crypto

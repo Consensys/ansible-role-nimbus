@@ -1,0 +1,21 @@
+---
+- name: Ensure we have sane configuration
+  block:
+    - fail:
+        msg: You must set "nimbus_version" for this role to run
+      when: nimbus_version is not defined
+
+- name: Get IP address to bind to if not provided
+  include_tasks: "network.yml"
+  when: not nimbus_host_ip
+  
+- name: Install nimbus
+  include_tasks: "install.yml"
+
+# - name: Start beacon
+#   include_tasks: "beacon.yml"
+#   when: nimbus_beacon_enabled
+
+# - name: Start validator
+#   include_tasks: "validator.yml"
+#   when: nimbus_validator_enabled

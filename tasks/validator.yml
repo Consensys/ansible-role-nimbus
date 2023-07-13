@@ -1,0 +1,98 @@
+---
+- name: Add basics to the validator cmdline_args
+  set_fact:
+    nimbus_validator_cmdline_args: >
+      {{nimbus_validator_cmdline_args}}
+      --{{nimbus_network}}
+      --datadir={{nimbus_validator_data_dir}}
+      --wallet-dir={{ nimbus_wallet_dir }}
+      --verbosity={{nimbus_log_level}}
+      --log-file={{nimbus_log_dir}}/validator.log
+      --log-format=json
+      --jwt-secret={{nimbus_jwt_auth_file}}
+      --execution-endpoint={{nimbus_execution_urls}}
+      --enable-builder
+      --validator-rpc-provider='{{nimbus_validator_validator_interface}}:{{nimbus_rpc_port}}'
+      --validator-rest-api-provider='{{nimbus_validator_validator_interface}}:{{nimbus_grpc_port}}'
+      --validator-rpc-gateway-provider='{{nimbus_validator_validator_interface}}:{{nimbus_grpc_port}}'
+      --accept-terms-of-use
+      --enable-doppelganger
+      --enable-external-slasher-protection
+    
+- name: Add metrics to the validator cmdline_args
+  set_fact:
+    nimbus_validator_cmdline_args: >
+      {{nimbus_validator_cmdline_args}}
+      --monitoring-host='{{ nimbus_metrics_interface}}'
+      --monitoring-port={{ nimbus_validator_metrics_port}}
+  when: nimbus_metrics_enabled|bool == True
+
+- name: Add RPC to the validator cmdline_args
+  set_fact:
+    nimbus_validator_cmdline_args: >
+      {{nimbus_validator_cmdline_args}}
+      --rpc-host='{{nimbus_rpc_interface}}'
+      --rpc-port={{nimbus_rpc_port}}
+      --grpc-gateway-corsdomain={{nimbus_rpc_cors}}
+      --grpc-gateway-host='{{nimbus_rpc_interface}}'
+      --grpc-gateway-port={{nimbus_grpc_port}}
+      --http-modules={{ nimbus_http_modules }}
+  when: nimbus_rpc_enabled|bool == True
+
+- name: Add fee receipt to the validator cmdline_args
+  set_fact:
+    nimbus_validator_cmdline_args: >
+      {{nimbus_validator_cmdline_args}}
+      --suggested-fee-recipient={{nimbus_default_fee_recipient}}
+  when: nimbus_default_fee_recipient != ""
+
+- name: Add checkpoint sync to the validator cmdline_args
+  set_fact:
+    nimbus_validator_cmdline_args: >
+      {{nimbus_validator_cmdline_args}}
+      --checkpoint-sync-url={{ nimbus_checkpoint_sync_url }}
+      --genesis-validator-api-url={{ nimbus_checkpoint_sync_url }}
+  when: nimbus_checkpoint_sync_url != ""
+
+- name: Add custom cli args if provided
+  set_fact:
+    nimbus_validator_cmdline_args: >
+      {{nimbus_validator_cmdline_args}}
+      {{ nimbus_validator_custom_cmdline_args }}
+  when: nimbus_validator_custom_cmdline_args != ""
+
+- name: Sanitize validator cmdline_args
+  set_fact:
+    nimbus_validator_cmdline_args: "{{nimbus_validator_cmdline_args | replace('\n', '') | replace('\"', '')}}"
+
+- name: Show validator cmdline_args
+  debug:
+    msg: "{{nimbus_validator_cmdline_args}}"
+
+- name: Create nimbus-validator systemd service
+  template:
+    src: "nimbus-validator.service.j2"
+    dest: "{{ nimbus_systemd_dir }}/nimbus-validator.service"
+    owner: "root"
+    group: "root"
+  become: true
+  register: validator_systemd_file
+
+- name: Set updated optionally to trigger a systemd restart at the end
+  set_fact:
+    nimbus_state_updates_validator: "{{ nimbus_state_updates_validator + ['nimbus.validator_systemd_file'] }}"
+  when: validator_systemd_file is changed
+
+- name: Reload systemd to reread configs
+  systemd:
+    daemon_reload: yes
+  become: true
+  when: validator_systemd_file is changed
+
+- name: Enable and start nimbus-validator service
+  systemd:
+    name: nimbus-validator
+    state: "{{ nimbus_systemd_state }}"
+    enabled: true
+  become: true
+  when: nimbus_state_updates_validator|length > 0 

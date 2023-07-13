@@ -1,0 +1,101 @@
+---
+- name: Add basics to the beacon cmdline_args
+  set_fact:
+    nimbus_beacon_cmdline_args: >
+      {{nimbus_beacon_cmdline_args}}
+      --{{nimbus_network}}
+      --datadir={{nimbus_data_dir}}
+      --verbosity={{nimbus_log_level}}
+      --log-file={{nimbus_log_dir}}/beacon.log
+      --log-format=json
+      --jwt-secret={{nimbus_jwt_auth_file}}
+      --execution-endpoint={{nimbus_execution_urls}}
+      --accept-terms-of-use
+
+- name: Add p2p settings to the beacon cmdline_args
+  set_fact:
+    nimbus_beacon_cmdline_args: >
+      {{nimbus_beacon_cmdline_args}}
+      --p2p-tcp-port={{nimbus_p2p_port}}
+      --p2p-udp-port={{nimbus_p2p_port}}
+      --p2p-host-ip='{{nimbus_host_ip}}'
+      --p2p-local-ip='{{nimbus_host_ip}}'
+  when: nimbus_p2p_enabled|bool == True
+
+- name: Add metrics to the beacon cmdline_args
+  set_fact:
+    nimbus_beacon_cmdline_args: >
+      {{nimbus_beacon_cmdline_args}}
+      --monitoring-host='{{ nimbus_metrics_interface}}'
+      --monitoring-port={{ nimbus_metrics_port}}
+  when: nimbus_metrics_enabled|bool == True
+
+- name: Add RPC to the beacon cmdline_args
+  set_fact:
+    nimbus_beacon_cmdline_args: >
+      {{nimbus_beacon_cmdline_args}}
+      --rpc-host='{{nimbus_rpc_interface}}'
+      --rpc-port={{nimbus_rpc_port}}
+      --grpc-gateway-corsdomain={{nimbus_rpc_cors}}
+      --grpc-gateway-host='{{nimbus_rpc_interface}}'
+      --grpc-gateway-port={{nimbus_grpc_port}}
+      --http-modules={{ nimbus_http_modules }}
+  when: nimbus_rpc_enabled|bool == True
+
+- name: Add fee receipt to the beacon cmdline_args
+  set_fact:
+    nimbus_beacon_cmdline_args: >
+      {{nimbus_beacon_cmdline_args}}
+      --suggested-fee-recipient={{nimbus_default_fee_recipient}}
+  when: nimbus_default_fee_recipient != ""
+
+- name: Add checkpoint sync to the beacon cmdline_args
+  set_fact:
+    nimbus_beacon_cmdline_args: >
+      {{nimbus_beacon_cmdline_args}}
+      --checkpoint-sync-url={{ nimbus_checkpoint_sync_url }}
+      --genesis-beacon-api-url={{ nimbus_checkpoint_sync_url }}
+  when: nimbus_checkpoint_sync_url != ""
+
+- name: Add custom cli args if provided
+  set_fact:
+    nimbus_beacon_cmdline_args: >
+      {{nimbus_beacon_cmdline_args}}
+      {{ nimbus_beacon_custom_cmdline_args }}
+  when: nimbus_beacon_custom_cmdline_args != ""
+
+- name: Sanitize beacon cmdline_args
+  set_fact:
+    nimbus_beacon_cmdline_args: "{{nimbus_beacon_cmdline_args | replace('\n', '') | replace('\"', '')}}"
+
+- name: Show beacon cmdline_args
+  debug:
+    msg: "{{nimbus_beacon_cmdline_args}}"
+
+- name: Create nimbus-beacon systemd service
+  template:
+    src: "nimbus-beacon.service.j2"
+    dest: "{{ nimbus_systemd_dir }}/nimbus-beacon.service"
+    owner: "root"
+    group: "root"
+  become: true
+  register: beacon_systemd_file
+
+- name: Set updated optionally to trigger a systemd restart at the end
+  set_fact:
+    nimbus_state_updates_beacon: "{{ nimbus_state_updates_beacon + ['nimbus.beacon_systemd_file'] }}"
+  when: beacon_systemd_file is changed
+
+- name: Reload systemd to reread configs
+  systemd:
+    daemon_reload: yes
+  become: true
+  when: beacon_systemd_file is changed
+
+- name: Enable and start nimbus-beacon service
+  systemd:
+    name: nimbus-beacon
+    state: "{{ nimbus_systemd_state }}"
+    enabled: true
+  become: true
+  when: nimbus_state_updates_beacon|length > 0 
