@@ -1,0 +1,14 @@
+---
+
+- name: Create nimbus-sync.sh
+  template:
+    src: "nimbus-sync.sh.j2"
+    dest: "{{ nimbus_base_dir }}/nimbus-sync.sh"
+    owner: "{{ nimbus_user }}"
+    group: "{{ nimbus_group }}"
+    mode: '0775'
+  become: true
+
+- name: Run nimbus-sync.sh
+  shell: "{{ nimbus_base_dir }}/nimbus-sync.sh"
+  become: true
