@@ -12,6 +12,10 @@
 - name: Install nimbus
   include_tasks: "install.yml"
 
+- name: Perform trusted node sync
+  include_tasks: "trusted-node-sync.yml"
+  when: nimbus_checkpoint_sync_url is defined
+
 - name: Start beacon
   include_tasks: "beacon.yml"
   when: nimbus_beacon_enabled

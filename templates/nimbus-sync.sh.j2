@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# vim: ft=sh
+set -e
+
+SERVICE_USER='{{ nimbus_user | mandatory }}'
+SERVICE_PATH='{{ nimbus_current_dir | mandatory }}'
+SERVICE_DATA='{{ nimbus_data_dir | mandatory }}'
+NETWORK_NAME='{{ nimbus_network | mandatory }}'
+
+TRUSTED_NODE_API_URL='{{ nimbus_checkpoint_sync_url }}'
+if [[ -z "${TRUSTED_NODE_API_URL}" ]]; then
+    echo "Usage: nimbus-sync.sh <trusted_node_url>" >&2
+    exit 2
+fi
+
+sudo -u "${SERVICE_USER}" "${SERVICE_PATH}/build/nimbus_beacon_node" \
+    trustedNodeSync \
+    --backfill=false \
+    --network="${NETWORK_NAME}" \
+    --data-dir="${SERVICE_DATA}" \
+    --trusted-node-url="${TRUSTED_NODE_API_URL}"
