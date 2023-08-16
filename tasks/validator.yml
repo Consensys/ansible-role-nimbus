@@ -14,13 +14,20 @@
       --status-bar=false
       --doppelganger-detection
       --beacon-node='{{nimbus_validator_beaconnodes}}'
+      --validators-dir={{nimbus_keys_dir}}
+      --secrets-dir={{nimbus_secrets_dir}}
+      --suggested-fee-recipient={{nimbus_default_fee_recipient}}
+
+- name: Add keymanager to the validator cmdline_args
+  set_fact:
+    nimbus_validator_cmdline_args: >
+      {{nimbus_validator_cmdline_args}}
       --keymanager
       --keymanager-port={{ nimbus_keymanger_port }}
       --keymanager-address='{{nimbus_keymanger_interface}}'
       --keymanager-allow-origin={{ nimbus_keymanager_cors }}
       --keymanager-token-file={{nimbus_keymanager_token_file}}
-      --validators-dir={{nimbus_keys_dir}}
-      --secrets-dir={{nimbus_secrets_dir}}
+  when: nimbus_keymanager_token_file != ""
 
 - name: Add metrics to the validator cmdline_args
   set_fact:
@@ -31,12 +38,12 @@
       --metrics-port={{ nimbus_validator_metrics_port}}
   when: nimbus_metrics_enabled|bool == True
 
-- name: Add fee receipt to the validator cmdline_args
+- name: Add graffiti to the validator cmdline_args
   set_fact:
     nimbus_validator_cmdline_args: >
       {{nimbus_validator_cmdline_args}}
-      --suggested-fee-recipient={{nimbus_default_fee_recipient}}
-  when: nimbus_default_fee_recipient != ""
+      --graffiti='{{ nimbus_graffiti }}'
+  when: nimbus_graffiti != ""
 
 - name: Add custom cli args if provided
   set_fact:

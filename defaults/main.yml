@@ -23,6 +23,7 @@ nimbus_keymanager_cors: "*"
 nimbus_keymanger_port: 7500
 nimbus_keymanger_interface: "127.0.0.1"
 nimbus_keymanager_token_file: ""
+nimbus_graffiti: ""
 
 nimbus_beacon_enabled: True
 nimbus_validator_enabled: False
