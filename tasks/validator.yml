@@ -3,15 +3,11 @@
   set_fact:
     nimbus_validator_cmdline_args: >
       {{nimbus_validator_cmdline_args}}
-      --network={{nimbus_network}}
       --data-dir={{nimbus_validator_data_dir}}
       --log-format=json
       --log-level={{nimbus_log_level}}
       --log-file={{nimbus_log_dir}}/validator.log
-      --jwt-secret={{nimbus_jwt_auth_file}}
-      --web3-url={{nimbus_execution_urls}}
       --non-interactive
-      --status-bar=false
       --doppelganger-detection
       --beacon-node='{{nimbus_validator_beaconnodes}}'
       --validators-dir={{nimbus_keys_dir}}
