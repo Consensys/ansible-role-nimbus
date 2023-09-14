@@ -12,6 +12,9 @@ SuccessExitStatus=143
 Restart=on-failure
 RestartSec=10s
 WorkingDirectory={{ nimbus_current_dir }}
+{% if nimbus_validator_limit_no_file %}
+LimitNOFILE={{ nimbus_validator_limit_no_file }}
+{% end %}
 
 [Install]
 WantedBy=multi-user.target

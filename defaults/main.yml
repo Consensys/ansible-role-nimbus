@@ -2,7 +2,7 @@
 # User and group
 nimbus_user: nimbus
 nimbus_group: "{{ nimbus_user }}"
-nimbus_architecture: "amd64" 
+nimbus_architecture: "amd64"
 # Version to install - linux only!
 # https://github.com/status-im/nimbus-eth2/releases/download/v23.6.1/nimbus-eth2_Linux_amd64_23.6.1_187e1a06.tar.gz
 nimbus_download_url: "https://github.com/status-im/nimbus-eth2/releases/download/{{ nimbus_version }}/nimbus-eth2_Linux_{{nimbus_architecture}}_{{ nimbus_version[1:] }}_{{ nimbus_git_hash }}.tar.gz"
@@ -39,6 +39,7 @@ nimbus_systemd_dir: /etc/systemd/system
 nimbus_state_updates: []
 nimbus_state_updates_validator: []
 nimbus_state_updates_beacon: []
+nimbus_validator_limit_no_file: 1024
 
 # nimbus config
 nimbus_network: mainnet
