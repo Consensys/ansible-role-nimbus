@@ -44,7 +44,6 @@ nimbus_validator_limit_no_file: 1024
 # nimbus config
 nimbus_network: mainnet
 nimbus_host_ip: ""
-nimbus_default_ip: "127.0.0.1"
 nimbus_log_level: INFO
 nimbus_execution_urls: "http://127.0.0.1:8551"
 nimbus_checkpoint_sync_url: "https://beaconstate-{{nimbus_network}}.chainsafe.io"
