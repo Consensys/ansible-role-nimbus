@@ -1,0 +1,24 @@
+---
+- name: Fetch latest Nimbus release information
+  uri:
+    url: https://api.github.com/repos/status-im/nimbus-eth2/releases/latest
+    method: GET
+    return_content: yes
+    status_code: 200
+  register: nimbus_latest_release
+
+- name: Extract latest version and asset URL
+  set_fact:
+    nimbus_version: "{{ nimbus_latest_release.json.tag_name }}"
+    nimbus_download_url: "{{ nimbus_latest_release.json.assets | selectattr('name', 'match', '^nimbus-eth2_Linux_' + nimbus_architecture + '.*\\.tar\\.gz$') | map(attribute='browser_download_url') | first }}"
+
+- name: Extract git hash from download URL
+  set_fact:
+    nimbus_git_hash: "{{ nimbus_download_url | regex_search('_([a-f0-9]+)\\.tar\\.gz$', '\\1') | first }}"
+
+- name: Display fetched version information
+  debug:
+    msg: 
+      - "Latest Nimbus version: {{ nimbus_version }}"
+      - "Download URL: {{ nimbus_download_url }}"
+      - "Git hash: {{ nimbus_git_hash }}"
