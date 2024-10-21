@@ -9,6 +9,13 @@
   include_tasks: "get_latest_version.yml"
   when: nimbus_version == "latest"
 
+- name: Set download URL for specific version
+  set_fact:
+  # Version to install - linux only!
+ # https://github.com/status-im/nimbus-eth2/releases/download/v23.6.1/nimbus-eth2_Linux_amd64_23.6.1_187e1a06.tar.gz
+    nimbus_download_url: "https://github.com/status-im/nimbus-eth2/releases/download/{{ nimbus_version }}/nimbus-eth2_Linux_{{ nimbus_architecture }}_{{ nimbus_version[1:] }}_{{ nimbus_git_hash }}.tar.gz"
+  when: nimbus_version != "latest"
+
 - name: Get IP address to bind to if not provided
   include_tasks: "network.yml"
   when: not nimbus_host_ip

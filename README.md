@@ -28,6 +28,7 @@ All variables which can be overridden are stored in [defaults/main.yml](defaults
 | Name                           | Default Value                      |  Description                                                                                                        |
 |--------------------------------|------------------------------------|---------------------------------------------------------------------------------------------------------------------|
 | `nimbus_version`               | latest                             | Version of nimbus to install and run. Use "latest" to automatically fetch the latest version.                       |
+| `nimbus_git_hash`              |                                   | Git hash of the specific version. Required when `nimbus_version` is not "latest".                                   |
 | `nimbus_user`                | nimbus                         | nimbus user                                                                                                   |
 | `nimbus_group`               | nimbus                         | nimbus group                                                                                                  |
 | `nimbus_base_dir`            | /opt/nimbus                    | Path to install to                                                                                           |

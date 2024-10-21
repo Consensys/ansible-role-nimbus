@@ -3,10 +3,8 @@
 nimbus_user: nimbus
 nimbus_group: "{{ nimbus_user }}"
 nimbus_architecture: "amd64"
-# Version to install - linux only!
-# https://github.com/status-im/nimbus-eth2/releases/download/v23.6.1/nimbus-eth2_Linux_amd64_23.6.1_187e1a06.tar.gz
 nimbus_version: "latest"
-nimbus_download_url: "{{ nimbus_version == 'latest' | ternary(nimbus_download_url, 'https://github.com/status-im/nimbus-eth2/releases/download/' + nimbus_version + '/nimbus-eth2_Linux_' + nimbus_architecture + '_' + nimbus_version[1:] + '_' + nimbus_git_hash + '.tar.gz') }}"
+nimbus_git_hash: ""  # This will be set automatically for "latest", or needs to be provided for specific versions
 
 # Directory paths
 nimbus_base_dir: "/opt/nimbus"
