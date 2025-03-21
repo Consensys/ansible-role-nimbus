@@ -34,3 +34,6 @@
 - name: Start validator
   include_tasks: "validator.yml"
   when: nimbus_validator_enabled
+
+- name: Set version info on a local file
+  include_tasks: "tags.yml"

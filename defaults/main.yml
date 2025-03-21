@@ -17,6 +17,7 @@ nimbus_log_dir: "/var/log/nimbus"
 nimbus_jwt_auth_file: "/etc/jwt-secret.hex"
 nimbus_keys_dir: "{{nimbus_config_dir}}/keys"
 nimbus_secrets_dir: "{{nimbus_config_dir}}/secrets"
+nimbus_version_info_file: "{{ nimbus_config_dir }}/clc_version"
 nimbus_secrets_password_file: ""
 nimbus_keymanager_cors: "*"
 nimbus_keymanger_port: 7500
