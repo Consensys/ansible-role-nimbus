@@ -7,7 +7,7 @@ User={{ nimbus_user }}
 Group={{ nimbus_group }}
 Environment=HOME=/home/{{ nimbus_user }}
 Type=simple
-ExecStart=/bin/sh -c "{{ nimbus_current_dir }}/build/nimbus_validator_client {{ nimbus_validator_internal_cmdline_args }} >> {{ nimbus_log_dir }}/validator.log 2>&1"
+ExecStart=/bin/sh -c "{{ nimbus_current_dir }}/build/nimbus_validator_client {{ _nimbus_validator_internal_cmdline_args }} >> {{ nimbus_log_dir }}/validator.log 2>&1"
 SuccessExitStatus=143
 Restart=on-failure
 RestartSec=10s
