@@ -47,6 +47,10 @@ All variables which can be overridden are stored in [defaults/main.yml](defaults
 | `nimbus_beacon_enabled`    | True                                 |  Default run the beacon node                                                                              |
 | `nimbus_validator_enabled` | False                                | Whether to run in validator mode - please note that the secrets and keys need to be copied by you         |
 
+
+> :warning: **Please do not override nimbus_internal_cmdline_args**: Be very careful here! Only use `nimbus_cmdline_args` which append to `nimbus_internal_cmdline_args`
+
+
 ### Keys/Secrets
 Please note that you must put your own secrets and keys in the config directory that you are using ie `nimbus_config_dir`
 

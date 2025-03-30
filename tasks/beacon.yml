@@ -1,8 +1,8 @@
 ---
 - name: Add basics to the beacon cmdline_args
   set_fact:
-    nimbus_beacon_cmdline_args: >
-      {{nimbus_beacon_cmdline_args}}
+    nimbus_beacon_internal_cmdline_args: >
+      {{nimbus_beacon_internal_cmdline_args}}
       --network={{nimbus_network}}
       --data-dir={{nimbus_data_dir}}
       --log-format=json
@@ -17,16 +17,16 @@
 
 - name: Add p2p settings to the beacon cmdline_args
   set_fact:
-    nimbus_beacon_cmdline_args: >
-      {{nimbus_beacon_cmdline_args}}
+    nimbus_beacon_internal_cmdline_args: >
+      {{nimbus_beacon_internal_cmdline_args}}
       --tcp-port={{nimbus_p2p_port}}
       --udp-port={{nimbus_p2p_port}}
   when: nimbus_p2p_enabled|bool == True
 
 - name: Add metrics to the beacon cmdline_args
   set_fact:
-    nimbus_beacon_cmdline_args: >
-      {{nimbus_beacon_cmdline_args}}
+    nimbus_beacon_internal_cmdline_args: >
+      {{nimbus_beacon_internal_cmdline_args}}
       --metrics
       --metrics-address='{{ nimbus_metrics_interface}}'
       --metrics-port={{ nimbus_metrics_port}}
@@ -34,8 +34,8 @@
 
 - name: Add RPC to the beacon cmdline_args
   set_fact:
-    nimbus_beacon_cmdline_args: >
-      {{nimbus_beacon_cmdline_args}}
+    nimbus_beacon_internal_cmdline_args: >
+      {{nimbus_beacon_internal_cmdline_args}}
       --rest                    
       --rest-address='{{nimbus_rest_interface}}'
       --rest-port={{nimbus_rest_port}}
@@ -44,25 +44,25 @@
 
 - name: Add fee receipt to the beacon cmdline_args
   set_fact:
-    nimbus_beacon_cmdline_args: >
-      {{nimbus_beacon_cmdline_args}}
+    nimbus_beacon_internal_cmdline_args: >
+      {{nimbus_beacon_internal_cmdline_args}}
       --suggested-fee-recipient={{nimbus_default_fee_recipient}}
   when: nimbus_default_fee_recipient != ""
 
 - name: Add custom cli args if provided
   set_fact:
-    nimbus_beacon_cmdline_args: >
-      {{nimbus_beacon_cmdline_args}}
-      {{ nimbus_beacon_custom_cmdline_args }}
-  when: nimbus_beacon_custom_cmdline_args != ""
+    nimbus_beacon_internal_cmdline_args: >
+      {{nimbus_beacon_internal_cmdline_args}}
+      {{ nimbus_beacon_cmdline_args }}
+  when: nimbus_beacon_cmdline_args != ""
 
 - name: Sanitize beacon cmdline_args
   set_fact:
-    nimbus_beacon_cmdline_args: "{{nimbus_beacon_cmdline_args | replace('\n', '') | replace('\"', '')}}"
+    nimbus_beacon_internal_cmdline_args: "{{nimbus_beacon_internal_cmdline_args | replace('\n', '') | replace('\"', '')}}"
 
 - name: Show beacon cmdline_args
   debug:
-    msg: "{{nimbus_beacon_cmdline_args}}"
+    msg: "{{nimbus_beacon_internal_cmdline_args}}"
 
 - name: Create nimbus-beacon systemd service
   template:
