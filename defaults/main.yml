@@ -27,10 +27,10 @@ nimbus_graffiti: ""
 
 nimbus_beacon_enabled: True
 nimbus_validator_enabled: False
-nimbus_beacon_cmdline_args: ""
-nimbus_validator_cmdline_args: ""
-nimbus_beacon_custom_cmdline_args: ""
-nimbus_validator_custom_cmdline_args: ""
+_nimbus_beacon_internal_cmdline_args: ""
+_nimbus_validator_internal_cmdline_args: ""
+nimbus_beacon_cmdline_args: []
+nimbus_validator_cmdline_args: []
 nimbus_validator_beaconnodes: "http://127.0.0.1:5051"
 
 # Managed service config

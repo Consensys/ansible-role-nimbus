@@ -1,8 +1,8 @@
 ---
 - name: Add basics to the validator cmdline_args
   set_fact:
-    nimbus_validator_cmdline_args: >
-      {{nimbus_validator_cmdline_args}}
+    _nimbus_validator_internal_cmdline_args: >
+      {{_nimbus_validator_internal_cmdline_args}}
       --data-dir={{nimbus_validator_data_dir}}
       --log-format=json
       --log-level={{nimbus_log_level}}
@@ -16,8 +16,8 @@
 
 - name: Add keymanager to the validator cmdline_args
   set_fact:
-    nimbus_validator_cmdline_args: >
-      {{nimbus_validator_cmdline_args}}
+    _nimbus_validator_internal_cmdline_args: >
+      {{_nimbus_validator_internal_cmdline_args}}
       --keymanager
       --keymanager-port={{ nimbus_keymanger_port }}
       --keymanager-address='{{nimbus_keymanger_interface}}'
@@ -27,8 +27,8 @@
 
 - name: Add metrics to the validator cmdline_args
   set_fact:
-    nimbus_validator_cmdline_args: >
-      {{nimbus_validator_cmdline_args}}
+    _nimbus_validator_internal_cmdline_args: >
+      {{_nimbus_validator_internal_cmdline_args}}
       --metrics
       --metrics-address='{{ nimbus_metrics_interface}}'
       --metrics-port={{ nimbus_validator_metrics_port}}
@@ -36,25 +36,25 @@
 
 - name: Add graffiti to the validator cmdline_args
   set_fact:
-    nimbus_validator_cmdline_args: >
-      {{nimbus_validator_cmdline_args}}
+    _nimbus_validator_internal_cmdline_args: >
+      {{_nimbus_validator_internal_cmdline_args}}
       --graffiti='{{ nimbus_graffiti }}'
   when: nimbus_graffiti != ""
 
 - name: Add custom cli args if provided
   set_fact:
-    nimbus_validator_cmdline_args: >
-      {{nimbus_validator_cmdline_args}}
-      {{ nimbus_validator_custom_cmdline_args }}
-  when: nimbus_validator_custom_cmdline_args != ""
+    _nimbus_validator_internal_cmdline_args: >
+      {{_nimbus_validator_internal_cmdline_args}}
+      {{ nimbus_validator_cmdline_args | join(' ') }}
+  when: nimbus_validator_cmdline_args != ""
 
 - name: Sanitize validator cmdline_args
   set_fact:
-    nimbus_validator_cmdline_args: "{{nimbus_validator_cmdline_args | replace('\n', '') | replace('\"', '')}}"
+    _nimbus_validator_internal_cmdline_args: "{{_nimbus_validator_internal_cmdline_args | replace('\n', '') | replace('\"', '')}}"
 
 - name: Show validator cmdline_args
   debug:
-    msg: "{{nimbus_validator_cmdline_args}}"
+    msg: "{{_nimbus_validator_internal_cmdline_args}}"
 
 - name: Create nimbus-validator systemd service
   template:
