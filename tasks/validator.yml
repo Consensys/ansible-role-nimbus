@@ -32,7 +32,7 @@
       --metrics
       --metrics-address='{{ nimbus_metrics_interface}}'
       --metrics-port={{ nimbus_validator_metrics_port}}
-  when: nimbus_metrics_enabled|bool == True
+  when: nimbus_metrics_enabled|bool
 
 - name: Add graffiti to the validator cmdline_args
   set_fact:
@@ -82,4 +82,4 @@
     state: "{{ nimbus_systemd_state }}"
     enabled: true
   become: true
-  when: nimbus_state_updates_validator|length > 0 
+  when: nimbus_state_updates_validator|length > 0

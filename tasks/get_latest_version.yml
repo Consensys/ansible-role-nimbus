@@ -18,7 +18,7 @@
 
 - name: Display fetched version information
   debug:
-    msg: 
+    msg:
       - "Latest Nimbus version: {{ nimbus_version }}"
       - "Download URL: {{ nimbus_download_url }}"
       - "Git hash: {{ nimbus_git_hash }}"

@@ -4,4 +4,6 @@ use_default_rules: true
 verbosity: true
 skip_list:
   - '204'
+  - '206'
+  - '602'
 

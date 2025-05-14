@@ -20,7 +20,7 @@
     group: "{{ nimbus_group }}"
   loop:
     - "{{ nimbus_base_dir }}"
-    - "{{ nimbus_install_dir }}"    
+    - "{{ nimbus_install_dir }}"
     - "{{ nimbus_config_dir }}"
     - "{{ nimbus_keys_dir }}"
     - "{{nimbus_secrets_dir}}"
@@ -60,5 +60,5 @@
     nimbus_state_updates_validator: "{{ nimbus_state_updates_validator + ['nimbus.install_dir'] }}"
     nimbus_state_updates_beacon: "{{ nimbus_state_updates_beacon + ['nimbus.install_dir'] }}"
   when: >
-    extract_src is changed or 
+    extract_src is changed or
     create_symlink is changed
