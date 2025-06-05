@@ -1,8 +1,18 @@
 - name: Set the version on a local file so it can be used by other automation
-  copy: 
+  copy:
     content: "{{nimbus_version[1:] }}_{{ nimbus_git_hash }}"
     dest: "{{ nimbus_version_info_file }}"
     owner: "{{ nimbus_user }}"
     group: "{{ nimbus_group }}"
-    mode: 0644    
-  become: true    
+    mode: 0644
+  become: true
+
+- name: tags | Set the nimbus validator version on a local file so it can be used by other automation
+  copy:
+    content: "{{nimbus_version[1:] }}_{{ nimbus_git_hash }}"
+    dest: "{{ nimbus_validator_version_info_file }}"
+    owner: "{{ nimbus_user }}"
+    group: "{{ nimbus_group }}"
+    mode: 0644
+  become: true
+  when: nimbus_validator_enabled

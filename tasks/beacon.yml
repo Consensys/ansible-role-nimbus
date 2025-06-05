@@ -5,6 +5,7 @@
       {{_nimbus_beacon_internal_cmdline_args}}
       --network={{nimbus_network}}
       --data-dir={{nimbus_data_dir}}
+      --history={{nimbus_history}}
       --log-format=json
       --log-level={{nimbus_log_level}}
       --log-file={{nimbus_log_dir}}/beacon.log
@@ -12,7 +13,6 @@
       --web3-url={{nimbus_execution_urls}}
       --non-interactive
       --status-bar=false
-      --doppelganger-detection
       --validator-monitor-auto
 
 - name: Add p2p settings to the beacon cmdline_args
@@ -21,7 +21,7 @@
       {{_nimbus_beacon_internal_cmdline_args}}
       --tcp-port={{nimbus_p2p_port}}
       --udp-port={{nimbus_p2p_port}}
-  when: nimbus_p2p_enabled|bool == True
+  when: nimbus_p2p_enabled|bool
 
 - name: Add metrics to the beacon cmdline_args
   set_fact:
@@ -30,17 +30,17 @@
       --metrics
       --metrics-address='{{ nimbus_metrics_interface}}'
       --metrics-port={{ nimbus_metrics_port}}
-  when: nimbus_metrics_enabled|bool == True
+  when: nimbus_metrics_enabled|bool
 
 - name: Add RPC to the beacon cmdline_args
   set_fact:
     _nimbus_beacon_internal_cmdline_args: >
       {{_nimbus_beacon_internal_cmdline_args}}
-      --rest                    
+      --rest
       --rest-address='{{nimbus_rest_interface}}'
       --rest-port={{nimbus_rest_port}}
       --rest-allow-origin={{nimbus_rest_cors}}
-  when: nimbus_rest_enabled|bool == True
+  when: nimbus_rest_enabled|bool
 
 - name: Add fee receipt to the beacon cmdline_args
   set_fact:
@@ -48,6 +48,27 @@
       {{_nimbus_beacon_internal_cmdline_args}}
       --suggested-fee-recipient={{nimbus_default_fee_recipient}}
   when: nimbus_default_fee_recipient != ""
+
+- name: Add graffiti to the beacon cmdline_args
+  set_fact:
+    _nimbus_beacon_internal_cmdline_args: >
+      {{_nimbus_beacon_internal_cmdline_args}}
+      --graffiti='{{ nimbus_graffiti }}'
+  when: nimbus_graffiti != ""
+
+- name: Add bootnodes to the beacon cmdline_args
+  set_fact:
+    _nimbus_beacon_internal_cmdline_args: >
+      {{_nimbus_beacon_internal_cmdline_args}}
+      --bootstrap-node='{{ nimbus_bootnodes }}'
+  when: nimbus_bootnodes != ""
+
+- name: Add doppelganger_detection to the beacon cmdline_args
+  set_fact:
+    _nimbus_beacon_internal_cmdline_args: >
+      {{_nimbus_beacon_internal_cmdline_args}}
+      --doppelganger-detection={{ nimbus_doppelganger_detection|bool|ternary('true', 'false')}}
+  when: nimbus_doppelganger_detection 
 
 - name: Add custom cli args if provided
   set_fact:
@@ -90,4 +111,4 @@
     state: "{{ nimbus_systemd_state }}"
     enabled: true
   become: true
-  when: nimbus_state_updates_beacon|length > 0 
+  when: nimbus_state_updates_beacon|length > 0
