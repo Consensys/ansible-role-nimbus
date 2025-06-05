@@ -5,6 +5,7 @@
       {{_nimbus_beacon_internal_cmdline_args}}
       --network={{nimbus_network}}
       --data-dir={{nimbus_data_dir}}
+      --history={{nimbus_history}}
       --log-format=json
       --log-level={{nimbus_log_level}}
       --log-file={{nimbus_log_dir}}/beacon.log
@@ -12,7 +13,6 @@
       --web3-url={{nimbus_execution_urls}}
       --non-interactive
       --status-bar=false
-      --doppelganger-detection
       --validator-monitor-auto
 
 - name: Add p2p settings to the beacon cmdline_args
@@ -48,6 +48,27 @@
       {{_nimbus_beacon_internal_cmdline_args}}
       --suggested-fee-recipient={{nimbus_default_fee_recipient}}
   when: nimbus_default_fee_recipient != ""
+
+- name: Add graffiti to the beacon cmdline_args
+  set_fact:
+    _nimbus_beacon_internal_cmdline_args: >
+      {{_nimbus_beacon_internal_cmdline_args}}
+      --graffiti='{{ nimbus_graffiti }}'
+  when: nimbus_graffiti != ""
+
+- name: Add bootnodes to the beacon cmdline_args
+  set_fact:
+    _nimbus_beacon_internal_cmdline_args: >
+      {{_nimbus_beacon_internal_cmdline_args}}
+      --bootstrap-node='{{ nimbus_bootnodes }}'
+  when: nimbus_graffiti != ""
+
+- name: Add doppelganger_detection to the beacon cmdline_args
+  set_fact:
+    _nimbus_beacon_internal_cmdline_args: >
+      {{_nimbus_beacon_internal_cmdline_args}}
+      --doppelganger-detection={{ nimbus_doppelganger_detection|bool|ternary('true', 'false')}}'
+  when: nimbus_doppelganger_detection 
 
 - name: Add custom cli args if provided
   set_fact:

@@ -4,11 +4,11 @@
     _nimbus_validator_internal_cmdline_args: >
       {{_nimbus_validator_internal_cmdline_args}}
       --data-dir={{nimbus_validator_data_dir}}
+      --history={{nimbus_history}}
       --log-format=json
       --log-level={{nimbus_log_level}}
       --log-file={{nimbus_log_dir}}/validator.log
       --non-interactive
-      --doppelganger-detection
       --beacon-node='{{nimbus_validator_beaconnodes}}'
       --validators-dir={{nimbus_keys_dir}}
       --secrets-dir={{nimbus_secrets_dir}}
@@ -40,6 +40,13 @@
       {{_nimbus_validator_internal_cmdline_args}}
       --graffiti='{{ nimbus_graffiti }}'
   when: nimbus_graffiti != ""
+
+- name: Add doppelganger_detection to the validator cmdline_args
+  set_fact:
+    _nimbus_validator_internal_cmdline_args: >
+      {{_nimbus_validator_internal_cmdline_args}}
+      --doppelganger-detection={{ nimbus_doppelganger_detection|bool|ternary('true', 'false')}}'
+  when: nimbus_doppelganger_detection 
 
 - name: Add custom cli args if provided
   set_fact:
