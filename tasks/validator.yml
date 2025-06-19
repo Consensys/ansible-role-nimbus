@@ -87,6 +87,6 @@
   systemd:
     name: nimbus-validator
     state: "{{ nimbus_systemd_state }}"
-    enabled: true
+    enabled: "{{ (nimbus_systemd_state!='stopped') | ternary('true', 'false') | bool }}"
   become: true
   when: nimbus_state_updates_validator|length > 0
