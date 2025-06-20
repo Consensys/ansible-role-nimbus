@@ -46,7 +46,7 @@
     _nimbus_validator_internal_cmdline_args: >
       {{_nimbus_validator_internal_cmdline_args}}
       --doppelganger-detection={{ nimbus_doppelganger_detection|bool|ternary('true', 'false')}}'
-  when: nimbus_doppelganger_detection 
+  when: nimbus_doppelganger_detection
 
 - name: Add custom cli args if provided
   set_fact:
@@ -87,6 +87,6 @@
   systemd:
     name: nimbus-validator
     state: "{{ nimbus_systemd_state }}"
-    enabled: true
+    enabled: "{{ (nimbus_systemd_state!='stopped') | ternary('true', 'false') | bool }}"
   become: true
   when: nimbus_state_updates_validator|length > 0
