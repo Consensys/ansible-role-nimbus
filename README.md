@@ -1,7 +1,7 @@
 # Ansible Role: nimbus
 
 ### Description
-Ansible role that will install, configure and runs [nimbus](https://github.com/nimbusaticlabs/nimbus): an enterprise Ethereum 2 Client
+Ansible role that will install, configure and runs [nimbus](https://nimbus.guide/index.html): an enterprise Ethereum 2 Client
 
 ### Table of Contents
   - [Supported Platforms](#supported-platforms)
