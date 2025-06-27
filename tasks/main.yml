@@ -5,6 +5,14 @@
         msg: You must set "nimbus_version" for this role to run
       when: nimbus_version is not defined
 
+- name: Fetch architecture of the host
+  debug:
+    var: ansible_facts.architecture
+
+- name: Set system architecture to download appropriate binary
+  set_fact:
+    nimbus_architecture: "{{ 'arm64v8' if ansible_facts.architecture == 'aarch64' else 'amd64' }}"
+
 - name: Fetch latest version information
   include_tasks: "get_latest_version.yml"
   when: nimbus_version == "latest"
