@@ -7,7 +7,6 @@
       --history={{nimbus_history}}
       --log-format=json
       --log-level={{nimbus_log_level}}
-      --log-file={{nimbus_log_dir}}/validator.log
       --non-interactive
       --beacon-node='{{nimbus_validator_beaconnodes}}'
       --validators-dir={{nimbus_keys_dir}}
