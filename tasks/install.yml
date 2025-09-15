@@ -18,6 +18,7 @@
     state: directory
     owner: "{{ nimbus_user }}"
     group: "{{ nimbus_group }}"
+    recurse: true
   loop:
     - "{{ nimbus_base_dir }}"
     - "{{ nimbus_install_dir }}"
