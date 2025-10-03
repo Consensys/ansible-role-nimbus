@@ -50,7 +50,7 @@ nimbus_network: mainnet
 nimbus_host_ip: ""
 nimbus_log_level: INFO
 nimbus_execution_urls: "http://127.0.0.1:8551"
-nimbus_checkpoint_sync_url: "https://beaconstate-{{nimbus_network}}.chainsafe.io"
+nimbus_checkpoint_sync_url: "https://checkpoint-sync.{{nimbus_network}}.ethpandaops.io"
 nimbus_default_fee_recipient: ""
 
 #p2p
