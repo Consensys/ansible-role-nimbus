@@ -1,7 +1,48 @@
 ---
+- name: Lookup nimbus user
+  getent:
+    database: passwd
+    key: "{{ nimbus_user }}"
+  register: nimbus_user_entry
+  failed_when: false
+
+- name: Extract current UID (only if user exists)
+  set_fact:
+    nimbus_current_uid: "{{ nimbus_user_entry.ansible_facts.getent_passwd[nimbus_user][1] | int }}"
+  when: not nimbus_user_entry.failed
+
+- name: Determine if UID update is needed
+  set_fact:
+    nimbus_uid_needs_update: "{{ nimbus_current_uid != nimbus_uid }}"
+  when: not nimbus_user_entry.failed
+
+- name: Stop enabled nimbus services if UID needs update
+  service:
+    name: "{{ item.name }}"
+    state: stopped
+  loop:
+    - name: nimbus-beacon
+      enabled: "{{ nimbus_beacon_enabled }}"
+    - name: nimbus-validator
+      enabled: "{{ nimbus_validator_enabled }}"
+  when:
+    - item.enabled
+    - not nimbus_user_entry.failed
+    - nimbus_uid_needs_update
+  become: true
+
+- name: Set updated optionally to trigger a systemd restart at the end
+  set_fact:
+    nimbus_state_updates_beacon: "{{ nimbus_state_updates_beacon + (['nimbus.uid'] if nimbus_beacon_enabled else []) }}
+    nimbus_state_updates_validator: "{{ nimbus_state_updates_validator + (['nimbus.uid'] if nimbus_validator_enabled else []) }}
+  when:
+    - not nimbus_user_entry.failed
+    - nimbus_uid_needs_update
+
 - name: Ensure nimbus group exists
   group:
     name: "{{ nimbus_group }}"
+    gid: "{{ nimbus_gid }}"
     state: present
   become: true
 
@@ -9,6 +50,7 @@
   user:
     comment:  nimbus client user
     name: "{{ nimbus_user }}"
+    uid: "{{ nimbus_uid }}"
     group: "{{ nimbus_group }}"
   become: true
 

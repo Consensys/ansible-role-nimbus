@@ -2,6 +2,9 @@
 # User and group
 nimbus_user: nimbus
 nimbus_group: "{{ nimbus_user }}"
+nimbus_uid: 1522
+nimbus_gid: 1522
+
 nimbus_architecture: "amd64"
 nimbus_version: "latest"
 nimbus_git_hash: ""  # This will be set automatically for "latest", or needs to be provided for specific versions
