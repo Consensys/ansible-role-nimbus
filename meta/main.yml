@@ -5,7 +5,7 @@ galaxy_info:
   description: nimbus is an open-source ethereum 2 client
   company: consensys
   license: license (Apache)
-  min_ansible_version: 2.6
+  min_ansible_version: "2.13"
   platforms:
     - name: Debian
       versions:

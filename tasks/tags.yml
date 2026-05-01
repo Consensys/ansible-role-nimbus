@@ -15,4 +15,4 @@
     group: "{{ nimbus_group }}"
     mode: 0644
   become: true
-  when: nimbus_validator_enabled
+  when: nimbus_validator_enabled | bool

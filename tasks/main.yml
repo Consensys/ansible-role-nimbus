@@ -37,11 +37,11 @@
 
 - name: Start beacon
   include_tasks: "beacon.yml"
-  when: nimbus_beacon_enabled
+  when: nimbus_beacon_enabled | bool
 
 - name: Start validator
   include_tasks: "validator.yml"
-  when: nimbus_validator_enabled
+  when: nimbus_validator_enabled | bool
 
 - name: Set version info on a local file
   include_tasks: "tags.yml"

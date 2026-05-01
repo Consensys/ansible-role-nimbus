@@ -45,7 +45,7 @@
     _nimbus_validator_internal_cmdline_args: >
       {{_nimbus_validator_internal_cmdline_args}}
       --doppelganger-detection={{ nimbus_doppelganger_detection|bool|ternary('true', 'false')}}'
-  when: nimbus_doppelganger_detection
+  when: nimbus_doppelganger_detection | bool
 
 - name: Add custom cli args if provided
   set_fact:

@@ -27,9 +27,9 @@
       state: stopped
     loop:
       - name: nimbus-beacon
-        enabled: "{{ nimbus_beacon_enabled }}"
+        enabled: "{{ nimbus_beacon_enabled | bool }}"
       - name: nimbus-validator
-        enabled: "{{ nimbus_validator_enabled }}"
+        enabled: "{{ nimbus_validator_enabled | bool }}"
     when:
       - item.enabled
       - nimbus_uid_needs_update
@@ -37,12 +37,12 @@
 
   - name: Set updated optionally to trigger a systemd restart at the end
     set_fact:
-      nimbus_state_updates_beacon: "{{ nimbus_state_updates_beacon + (['nimbus.uid'] if nimbus_beacon_enabled else []) }}"
-      nimbus_state_updates_validator: "{{ nimbus_state_updates_validator + (['nimbus.uid'] if nimbus_validator_enabled else []) }}"
+      nimbus_state_updates_beacon: "{{ nimbus_state_updates_beacon + (['nimbus.uid'] if nimbus_beacon_enabled | bool else []) }}"
+      nimbus_state_updates_validator: "{{ nimbus_state_updates_validator + (['nimbus.uid'] if nimbus_validator_enabled | bool else []) }}"
     when:
       - nimbus_uid_needs_update
 
-  when: nimbus_user_exists
+  when: nimbus_user_exists | bool
 
 - name: Ensure nimbus group exists
   group:
