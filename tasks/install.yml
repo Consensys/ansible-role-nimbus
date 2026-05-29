@@ -1,66 +1,86 @@
 ---
-- name: Lookup nimbus user
-  getent:
+- name: install | Lookup nimbus user
+  ansible.builtin.getent:
     database: passwd
     key: "{{ nimbus_user }}"
   register: nimbus_user_entry
   failed_when: false
 
 - name: install | Determine if nimbus user exists
-  set_fact:
+  ansible.builtin.set_fact:
     nimbus_user_exists: "{{ nimbus_user in (nimbus_user_entry.ansible_facts.getent_passwd | default({})) }}"
 
-
-- block:
-
-  - name: Extract current UID (only if user exists)
-    set_fact:
-      nimbus_current_uid: "{{ nimbus_user_entry.ansible_facts.getent_passwd[nimbus_user][1] | int }}"
-
-  - name: Determine if UID update is needed
-    set_fact:
-      nimbus_uid_needs_update: "{{ nimbus_current_uid != nimbus_uid }}"
-
-  - name: Stop enabled nimbus services if UID needs update
-    service:
-      name: "{{ item.name }}"
-      state: stopped
-    loop:
-      - name: nimbus-beacon
-        enabled: "{{ nimbus_beacon_enabled | bool }}"
-      - name: nimbus-validator
-        enabled: "{{ nimbus_validator_enabled | bool }}"
-    when:
-      - item.enabled
-      - nimbus_uid_needs_update
-    become: true
-
-  - name: Set updated optionally to trigger a systemd restart at the end
-    set_fact:
-      nimbus_state_updates_beacon: "{{ nimbus_state_updates_beacon + (['nimbus.uid'] if nimbus_beacon_enabled | bool else []) }}"
-      nimbus_state_updates_validator: "{{ nimbus_state_updates_validator + (['nimbus.uid'] if nimbus_validator_enabled | bool else []) }}"
-    when:
-      - nimbus_uid_needs_update
-
+- name: install | If nimbus user exists - check if the UID matches the expected value
   when: nimbus_user_exists | bool
+  block:
+    - name: install | Extract current UID
+      ansible.builtin.set_fact:
+        nimbus_current_uid: "{{ nimbus_user_entry.ansible_facts.getent_passwd[nimbus_user][1] | int }}"
 
-- name: Ensure nimbus group exists
-  group:
+    - name: install | Determine if UID update is needed
+      ansible.builtin.set_fact:
+        nimbus_uid_needs_update: "{{ nimbus_current_uid != nimbus_uid }}"
+
+- name: install | Populate service facts
+  ansible.builtin.service_facts:
+
+- name: install | Debug nimbus-beacon service state
+  ansible.builtin.debug:
+    var: ansible_facts.services['nimbus-beacon.service']
+
+- name: install | Debug nimbus-validator service state
+  ansible.builtin.debug:
+    var: ansible_facts.services['nimbus-validator.service']
+
+- name: install | Halt beacon service if running while we update
+  ansible.builtin.systemd:
+    name: nimbus-beacon
+    state: stopped
+  become: true
+  register: nimbus_beacon_systemd_stopped
+  when: (ansible_facts.services['nimbus-beacon.service'] is defined) and
+        ((ansible_facts.services['nimbus-beacon.service'].status == "enabled") or
+         (nimbus_uid_needs_update | default(false) | bool))
+
+- name: install | Halt validator service if running while we update
+  ansible.builtin.systemd:
+    name: nimbus-validator
+    state: stopped
+  become: true
+  register: nimbus_validator_systemd_stopped
+  when: (ansible_facts.services['nimbus-validator.service'] is defined) and
+        ((ansible_facts.services['nimbus-validator.service'].status == "enabled") or
+         (nimbus_uid_needs_update | default(false) | bool))
+
+- name: install | Set updated to trigger beacon systemd restart at the end
+  ansible.builtin.set_fact:
+    nimbus_state_updates_beacon: "{{ nimbus_state_updates_beacon + ['nimbus.uid'] }}"
+  when: (nimbus_beacon_systemd_stopped is defined) and
+        (nimbus_beacon_systemd_stopped.state | default('') == "stopped")
+
+- name: install | Set updated to trigger validator systemd restart at the end
+  ansible.builtin.set_fact:
+    nimbus_state_updates_validator: "{{ nimbus_state_updates_validator + ['nimbus.uid'] }}"
+  when: (nimbus_validator_systemd_stopped is defined) and
+        (nimbus_validator_systemd_stopped.state | default('') == "stopped")
+
+- name: install | Ensure nimbus group exists
+  ansible.builtin.group:
     name: "{{ nimbus_group }}"
     gid: "{{ nimbus_gid }}"
     state: present
   become: true
 
-- name: Create nimbus user
-  user:
-    comment:  nimbus client user
+- name: install | Create nimbus user
+  ansible.builtin.user:
+    comment: nimbus client user
     name: "{{ nimbus_user }}"
     uid: "{{ nimbus_uid }}"
     group: "{{ nimbus_group }}"
   become: true
 
-- name: Create directories
-  file:
+- name: install | Create directories
+  ansible.builtin.file:
     path: "{{ item }}"
     state: directory
     owner: "{{ nimbus_user }}"
@@ -71,22 +91,22 @@
     - "{{ nimbus_install_dir }}"
     - "{{ nimbus_config_dir }}"
     - "{{ nimbus_keys_dir }}"
-    - "{{nimbus_secrets_dir}}"
+    - "{{ nimbus_secrets_dir }}"
     - "{{ nimbus_data_dir }}"
     - "{{ nimbus_validator_data_dir }}"
     - "{{ nimbus_log_dir }}"
   become: true
 
-- name: Setup logrotate
-  template:
+- name: install | Setup logrotate
+  ansible.builtin.template:
     src: "logrotate/nimbus"
     dest: "/etc/logrotate.d/nimbus"
   become: true
 
-- name: Get nimbus binary to install directory
-  unarchive:
+- name: install | Get nimbus binary to install directory
+  ansible.builtin.unarchive:
     src: "{{ nimbus_download_url }}"
-    remote_src: "{{ true }}"
+    remote_src: true
     dest: "{{ nimbus_install_dir }}"
     owner: "{{ nimbus_user }}"
     group: "{{ nimbus_group }}"
@@ -94,19 +114,17 @@
   become: true
   register: extract_src
 
-- name: Create a symlink to current
-  file:
-    src: "{{ nimbus_install_dir }}/nimbus-eth2_Linux_{{nimbus_architecture}}_{{nimbus_version[1:] }}_{{ nimbus_git_hash }}"
+- name: install | Create a symlink to current
+  ansible.builtin.file:
+    src: "{{ nimbus_install_dir }}/nimbus-eth2_Linux_{{ nimbus_architecture }}_{{ nimbus_version[1:] }}_{{ nimbus_git_hash }}"
     dest: "{{ nimbus_current_dir }}"
     state: link
   register: create_symlink
   become: true
 
-- name: Set updated optionally to trigger a systemd restart at the end
-  set_fact:
+- name: install | Set updated to trigger a systemd restart at the end
+  ansible.builtin.set_fact:
     nimbus_state_updates: "{{ nimbus_state_updates + ['nimbus.install_dir'] }}"
-    nimbus_state_updates_validator: "{{ nimbus_state_updates_validator + ['nimbus.install_dir'] }}"
     nimbus_state_updates_beacon: "{{ nimbus_state_updates_beacon + ['nimbus.install_dir'] }}"
-  when: >
-    extract_src is changed or
-    create_symlink is changed
+    nimbus_state_updates_validator: "{{ nimbus_state_updates_validator + ['nimbus.install_dir'] }}"
+  when: extract_src is changed or create_symlink is changed
